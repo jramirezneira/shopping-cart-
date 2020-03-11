@@ -1,12 +1,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { addToCart } from '../actions'
-import { getVisibleProducts, getType } from '../reducers/products'
+import { getVisibleProducts, getType, getLocation } from '../reducers/products'
 import ProductItem from '../components/ProductItem'
 
 
-function dynamicSort(property) {
 
+
+const dynamicSort = (property) => {
     if(property===null || property==="Título")
         return function (a,b) {
                 return a["titulo"].localeCompare(b["titulo"]);
@@ -14,33 +15,28 @@ function dynamicSort(property) {
     if(property==="Menor Precio")
         return function (a,b) {
                 return parseFloat(a.valor_oferta.replace("$","")) - parseFloat(b.valor_oferta.replace("$",""));
-
         }
     if(property==="Mayor Precio")
         return function (a,b) {
                 return parseFloat(b.valor_oferta.replace("$","")) - parseFloat(a.valor_oferta.replace("$",""));
-
         }
     if(property==="Mejor Calificación")
         return function (a,b) {
                 return parseFloat(b.calificaciones_numerica.replace("$","")) - parseFloat(a.calificaciones_numerica.replace("$",""));
-
         }
     if(property==="Menor distancia")
-        return function (a,b) {
-
+        return  (a,b) => {
                 return parseFloat(a.distancia - parseFloat(b.distancia));
-
         }
-        //calificaciones_numerica
 }
 
 
-const ProductsContainer = ({ products, addToCart, type }) => (
+const ProductsContainer = ({ products,addToCart,  type, loc }) => (
+  
+  //console.log(loc),
   products=  products.sort(dynamicSort(type)),
   <div className="row flex-row">
     {products.map(product =>
-
       <ProductItem
         key={product.id_descuento}
         product={product}
@@ -49,15 +45,14 @@ const ProductsContainer = ({ products, addToCart, type }) => (
   </div>
 )
 
-
-
 const mapStateToProps = state => ({
-  products: getVisibleProducts(state.products),
-  type: getType(state)
+  //ff:getGeolocation(),
+  products: getVisibleProducts(state.products),  
+  type: getType(state),
+  loc:getLocation(state)
 })
 
-
 export default connect(
-  mapStateToProps,
+  mapStateToProps,  
   { addToCart }
 )(ProductsContainer)

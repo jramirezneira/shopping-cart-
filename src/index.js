@@ -12,21 +12,31 @@ import Pay from './containers/Pay'
 import {BrowserRouter, Switch, Route} from 'react-router-dom';
 
 
+
+
+
 const middleware = [ thunk ];
 if (process.env.NODE_ENV !== 'production') {
   middleware.push(createLogger());
 }
 
+// crea el store de redux
 const store = createStore(
   reducer,
   applyMiddleware(...middleware)
 )
+// cargo los productos
+
 store.dispatch(getAllProducts())
+
+
+
 class Root extends Component{
-
-
+     
     render()
     {
+      console.log(this.state)
+      
       return(
         <Provider store={store}>
             <BrowserRouter basename={'/'}>
@@ -40,4 +50,5 @@ class Root extends Component{
 
     }
 }
+
  ReactDOM.render(<Root/>, document.getElementById('root'));

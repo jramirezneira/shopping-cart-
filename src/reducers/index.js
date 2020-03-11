@@ -1,27 +1,24 @@
 import { combineReducers } from 'redux'
-import cart, * as fromCart from './cart'
+import cart  from './cart'
 import products, * as fromProducts from './products'
+import { getLocalStorageCart } from '../localStore'
 
-export default combineReducers({
-  cart,
-  products
-})
-
-const getAddedIds = state => fromCart.getAddedIds(state.cart)
-export const getQuantity = (state, id) => fromCart.getQuantity(state.cart, id)
+export default combineReducers({ cart, products})
 const getProduct = (state, id) => fromProducts.getProduct(state.products, id)
-//export const getType = (state) => fromProducts.getType(state)
 
-export const getTotal = state =>
-  getAddedIds(state)
-    .reduce((total, id) =>
-      parseInt(total + getProduct(state, id).valor_oferta.replace("$","").replace(".","") * getQuantity(state, id)) ,
-      0
-    )
-    .toFixed(2)
+export const getTotal = state => 
+{
+  let total=0;
+  getCartProducts(state).map (( product) =>   
+      product.valor_oferta !== undefined ? total=parseInt(total + product.valor_oferta.replace("$","").replace(".","") * product.quantity) :0   
+  )
+  return total
+}
 
-export const getCartProducts = state =>
-  getAddedIds(state).map(id => ({
+export const getCartProducts = state =>(
+  Object.entries(getLocalStorageCart()).map(([id, cantidad]) => ({      
     ...getProduct(state, id),
-    quantity: getQuantity(state, id)
-  }))
+    quantity: cantidad//getQuantity(state, id)
+  })));
+
+

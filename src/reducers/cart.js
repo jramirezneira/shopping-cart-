@@ -4,6 +4,7 @@ import {
   CHECKOUT_FAILURE,
   DELETE_TO_CART
 } from '../constants/ActionTypes'
+import { addToLocalStorageCart, removeItemLocalStorageCart, removeLocalStorageCart } from '../localStore'
 
 const initialState = {
   addedIds: [],
@@ -13,17 +14,17 @@ const initialState = {
 
 const addedIds = (state = initialState.addedIds, action) => {
    // const dr= state.filter(( id }) => id != action.productId);
-   console.log(state);
-   console.log(action.productId);
+   
   switch (action.type) {
     case ADD_TO_CART:
       if (state.indexOf(action.productId) !== -1) {
         return state
       }
-      return [ ...state, action.productId ]
+      addToLocalStorageCart(action.productId);
+      return [ ...state/*, action.productId*/ ]
     case DELETE_TO_CART:
-
-      return state.filter( id  => id !== action.productId)
+      removeItemLocalStorageCart(action.productId);
+      return state//.filter( id  => id !== action.productId)
     default:
       return state
   }
@@ -36,9 +37,10 @@ const quantityById = (state = initialState.quantityById, action) => {
     case ADD_TO_CART:
 
       return { ...state,
-        [productId]: (state[productId] || 0) + 1
+        //[productId]: (state[productId] || 0) + 1
       }
     case DELETE_TO_CART:
+     
       return { ...state,
             [productId]: 0
          }
@@ -48,8 +50,7 @@ const quantityById = (state = initialState.quantityById, action) => {
 }
 
 
-export const getQuantity = (state, productId) =>
-  state.quantityById[productId] || 0
+export const getQuantity = (state, productId) =>  state.quantityById[productId] || 0
 
 export const getAddedIds = state => state.addedIds
 
@@ -57,6 +58,7 @@ const cart = (state = initialState, action) => {
 
   switch (action.type) {
     case CHECKOUT_REQUEST:
+      removeLocalStorageCart();
       return initialState
     case CHECKOUT_FAILURE:
       return action.cart

@@ -1,5 +1,4 @@
 import * as types from '../constants/ActionTypes'
-//import _products from './../api/products.json'
 
 const receiveProducts = products => ({
   type: types.RECEIVE_PRODUCTS,
@@ -7,11 +6,25 @@ const receiveProducts = products => ({
 })
 
 
-export const  getAllProducts =  () => dispatch => {
+
+export const  getAllProducts =  () => ( dispatch ) => {  
+ 
+    //Recupera la localización del usuario
+    navigator.geolocation.getCurrentPosition(function (p) {
+      localStorage.setItem("latitude", p.coords.latitude);
+      localStorage.setItem("longitude", p.coords.longitude)
+    }, function () {
+      // en caso de error informa ubicación por defecto
+      localStorage.setItem("latitude", -33.45774340);
+      localStorage.setItem("longitude",-70.65735780)
+    
+    }, {maximumAge:60000, timeout:5000, enableHighAccuracy:true});
+
+    var lat = localStorage.latitude;
+    var lon = localStorage.longitude; 
 
 
-
-    fetch("https://ww4.cuponatic.com/get?c=Santiago&latitud=-33.45774340&longitud=-70.65735780&")
+    fetch("https://ww4.cuponatic.com/get?c=Santiago&latitud="+lat+"&longitud="+lon+"&")
      .then(
         response => response.json(),
         error => console.log('An error occurred.', error)
@@ -27,10 +40,7 @@ const chooseTypeSearchUnsafe = typechoose => ({
 })
 
 export const chooseTypeSearch = type => (dispatch) => {
-
- // if (getState().products.byId[productId].inventory > 0) {
     dispatch(chooseTypeSearchUnsafe(type))
- // }
 }
 
 const addToCartUnsafe = productId => ({
@@ -38,37 +48,26 @@ const addToCartUnsafe = productId => ({
   productId
 })
 
-export const addToCart = productId => (dispatch, getState) => {
- // if (getState().products.byId[productId].inventory > 0) {
-    dispatch(addToCartUnsafe(productId))
- // }
+export const addToCart = productId => (dispatch) => {
+    dispatch(addToCartUnsafe(productId));
 }
-
-
 
 const deleteToCartUnsafe = productId => ({
   type: types.DELETE_TO_CART,
   productId
 })
 
-
-
-export const deleteToCart = productId => (dispatch, getState) => {
+export const deleteToCart = productId => (dispatch) => {
   dispatch(deleteToCartUnsafe(productId))
 }
 
-
-export const checkout = products => (dispatch, getState) => {
-
+export const checkout = products => (dispatch) => {
   dispatch({
     type: types.CHECKOUT_REQUEST
   })
-  /*shop.buyProducts(products, () => {
-    dispatch({
-      type: types.CHECKOUT_SUCCESS,
-      cart
-    })
-    // Replace the line above with line below to rollback on failure:
-    // dispatch({ type: types.CHECKOUT_FAILURE, cart })
-  })*/
+ 
 }
+
+
+
+
